@@ -28,6 +28,16 @@ function AllToolsContent() {
   const [showPopularOnly, setShowPopularOnly] = useState(initialFilter === "popular");
   const [sortBy, setSortBy] = useState<"id" | "name" | "popular">("id");
 
+  // Keep state in sync when navigation query parameters change
+  React.useEffect(() => {
+    const s = searchParams.get("search") || "";
+    const c = searchParams.get("category") || "all";
+    const f = searchParams.get("filter") || "";
+    setSearch(s);
+    setSelectedCategory(c);
+    setShowPopularOnly(f === "popular");
+  }, [searchParams]);
+
   // Filtering and sorting logic
   const filteredTools = useMemo(() => {
     return TOOLS.filter((tool) => {

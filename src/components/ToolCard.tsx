@@ -75,3 +75,4 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, featured = false }) =>
 };
 
 export default ToolCard;
+

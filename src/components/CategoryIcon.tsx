@@ -66,3 +66,4 @@ export const CategoryIcon: React.FC<CategoryIconProps> = ({
 };
 
 export default CategoryIcon;
+

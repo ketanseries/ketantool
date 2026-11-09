@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -8,9 +8,6 @@ import {
   X,
   ChevronDown,
   Sparkles,
-  Grid,
-  Info,
-  Layers,
   ArrowRight,
 } from "lucide-react";
 import Logo from "./Logo";
@@ -19,9 +16,11 @@ import { CATEGORIES } from "@/data/categories";
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoriesDropdownOpen, setCategoriesDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Monitor scroll for shadow & blur intensification
   useEffect(() => {
@@ -38,6 +37,17 @@ export const Navbar: React.FC = () => {
     setCategoriesDropdownOpen(false);
   }, [pathname]);
 
+  // Handle click outside for categories dropdown
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setCategoriesDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <header
       className={`sticky top-0 z-40 w-full transition-all duration-300 ${
@@ -51,24 +61,26 @@ export const Navbar: React.FC = () => {
         <Logo variant="navbar" />
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+        <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2">
+          {/* Home Link */}
           <Link
             href="/"
-            className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            className={`rounded-xl px-3.5 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer active:scale-95 ${
               pathname === "/"
-                ? "text-blue-400 bg-blue-500/10"
-                : "text-slate-300 hover:text-white hover:bg-slate-800/50"
+                ? "text-blue-400 bg-blue-500/15 border border-blue-500/30 shadow-sm"
+                : "text-slate-300 hover:text-white hover:bg-slate-800/70"
             }`}
           >
             Home
           </Link>
 
+          {/* All 300 Tools Link */}
           <Link
             href="/tools"
-            className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            className={`rounded-xl px-3.5 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer active:scale-95 ${
               pathname === "/tools"
-                ? "text-blue-400 bg-blue-500/10"
-                : "text-slate-300 hover:text-white hover:bg-slate-800/50"
+                ? "text-blue-400 bg-blue-500/15 border border-blue-500/30 shadow-sm"
+                : "text-slate-300 hover:text-white hover:bg-slate-800/70"
             }`}
           >
             All 300 Tools
@@ -76,18 +88,21 @@ export const Navbar: React.FC = () => {
 
           {/* Categories Mega Dropdown */}
           <div
+            ref={dropdownRef}
             className="relative"
             onMouseEnter={() => setCategoriesDropdownOpen(true)}
             onMouseLeave={() => setCategoriesDropdownOpen(false)}
           >
             <button
               type="button"
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              onClick={() => setCategoriesDropdownOpen((prev) => !prev)}
+              className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer active:scale-95 select-none ${
                 categoriesDropdownOpen || pathname.startsWith("/categories")
-                  ? "text-blue-400 bg-blue-500/10"
-                  : "text-slate-300 hover:text-white hover:bg-slate-800/50"
+                  ? "text-blue-400 bg-blue-500/15 border border-blue-500/30 shadow-sm"
+                  : "text-slate-300 hover:text-white hover:bg-slate-800/70"
               }`}
               aria-expanded={categoriesDropdownOpen}
+              aria-haspopup="true"
             >
               <span>Categories</span>
               <ChevronDown
@@ -98,13 +113,17 @@ export const Navbar: React.FC = () => {
             </button>
 
             {categoriesDropdownOpen && (
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[580px] rounded-2xl border border-slate-700/80 bg-slate-900/95 p-4 shadow-2xl backdrop-blur-2xl">
+              <div
+                className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[580px] rounded-2xl border border-slate-700/80 bg-slate-900/95 p-4 shadow-2xl backdrop-blur-2xl z-50 animate-in fade-in zoom-in-95 duration-150"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="grid grid-cols-2 gap-2">
                   {CATEGORIES.map((cat) => (
                     <Link
                       key={cat.id}
                       href={`/categories/${cat.id}`}
-                      className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-slate-800/70"
+                      onClick={() => setCategoriesDropdownOpen(false)}
+                      className="group flex items-start gap-3 rounded-xl p-2.5 transition-all hover:bg-slate-800/80 hover:translate-x-0.5 cursor-pointer"
                     >
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-800 text-blue-400 group-hover:bg-blue-600/20 group-hover:text-cyan-300 transition-colors">
                         <CategoryIcon name={cat.id} className="w-4 h-4" />
@@ -130,7 +149,8 @@ export const Navbar: React.FC = () => {
                   <span>Explore full directory of utilities</span>
                   <Link
                     href="/tools"
-                    className="text-blue-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1"
+                    onClick={() => setCategoriesDropdownOpen(false)}
+                    className="text-blue-400 hover:text-cyan-300 font-semibold inline-flex items-center gap-1 cursor-pointer"
                   >
                     View All 300 Tools <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
@@ -139,20 +159,22 @@ export const Navbar: React.FC = () => {
             )}
           </div>
 
+          {/* Popular Tools Link */}
           <Link
             href="/tools?filter=popular"
-            className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors"
+            className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer active:scale-95 text-slate-300 hover:text-amber-300 hover:bg-slate-800/70"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span>Popular</span>
           </Link>
 
+          {/* About Us Link */}
           <Link
             href="/about"
-            className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            className={`rounded-xl px-3.5 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer active:scale-95 ${
               pathname === "/about"
-                ? "text-blue-400 bg-blue-500/10"
-                : "text-slate-300 hover:text-white hover:bg-slate-800/50"
+                ? "text-blue-400 bg-blue-500/15 border border-blue-500/30 shadow-sm"
+                : "text-slate-300 hover:text-white hover:bg-slate-800/70"
             }`}
           >
             About
@@ -163,7 +185,7 @@ export const Navbar: React.FC = () => {
         <div className="hidden sm:flex items-center gap-3">
           <Link
             href="/tools"
-            className="relative inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 via-violet-600 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-glow transition-all duration-300 hover:opacity-95 hover:shadow-cyan-500/25 active:scale-95"
+            className="relative inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 via-violet-600 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-white shadow-glow transition-all duration-300 hover:opacity-95 hover:shadow-cyan-500/25 active:scale-95 cursor-pointer"
           >
             <span>Explore Tools</span>
             <ArrowRight className="ml-1.5 w-4 h-4" />
@@ -174,14 +196,14 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center gap-2 lg:hidden">
           <Link
             href="/tools"
-            className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white sm:hidden"
+            className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white sm:hidden cursor-pointer"
           >
             300 Tools
           </Link>
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="rounded-xl border border-slate-800 p-2 text-slate-400 hover:text-white hover:bg-slate-900 transition-colors"
+            className="rounded-xl border border-slate-800 p-2 text-slate-400 hover:text-white hover:bg-slate-900 transition-colors cursor-pointer"
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -195,19 +217,22 @@ export const Navbar: React.FC = () => {
           <div className="space-y-1">
             <Link
               href="/"
-              className="block rounded-lg px-3 py-2 text-base font-medium text-slate-200 hover:bg-slate-800"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block rounded-lg px-3 py-2 text-base font-medium text-slate-200 hover:bg-slate-800 cursor-pointer"
             >
               Home
             </Link>
             <Link
               href="/tools"
-              className="block rounded-lg px-3 py-2 text-base font-medium text-slate-200 hover:bg-slate-800"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block rounded-lg px-3 py-2 text-base font-medium text-slate-200 hover:bg-slate-800 cursor-pointer"
             >
               All 300 Tools
             </Link>
             <Link
               href="/tools?filter=popular"
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-base font-medium text-amber-300 hover:bg-slate-800"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-base font-medium text-amber-300 hover:bg-slate-800 cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
               <span>Popular Tools</span>
@@ -221,7 +246,8 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={cat.id}
                   href={`/categories/${cat.id}`}
-                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-blue-400"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-blue-400 cursor-pointer"
                 >
                   <CategoryIcon name={cat.id} className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                   <span className="truncate">{cat.shortName}</span>
@@ -232,19 +258,22 @@ export const Navbar: React.FC = () => {
             <div className="pt-3 border-t border-slate-800 space-y-1">
               <Link
                 href="/about"
-                className="block rounded-lg px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block rounded-lg px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer"
               >
                 About Us
               </Link>
               <Link
                 href="/contact"
-                className="block rounded-lg px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block rounded-lg px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer"
               >
                 Contact Support
               </Link>
               <Link
                 href="/privacy"
-                className="block rounded-lg px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block rounded-lg px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer"
               >
                 Privacy Policy
               </Link>
