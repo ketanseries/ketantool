@@ -1,0 +1,47 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="blueCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#22D3EE" />
+    </linearGradient>
+    <linearGradient id="violetBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#3B82F6" />
+    </linearGradient>
+    <linearGradient id="cyanViolet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22D3EE" />
+      <stop offset="100%" stop-color="#8B5CF6" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Ambient Backdrop Glow -->
+  <circle cx="128" cy="128" r="90" fill="#3B82F6" opacity="0.15" filter="url(#glow)"/>
+  
+  <!-- Outer Rounded Shield -->
+  <rect x="24" y="24" width="208" height="208" rx="48" fill="#0B1020" stroke="url(#blueCyan)" stroke-width="4" stroke-opacity="0.4"/>
+  
+  <!-- Inner Subtle Grid Glow -->
+  <rect x="28" y="28" width="200" height="200" rx="44" fill="none" stroke="url(#violetBlue)" stroke-width="1" stroke-dasharray="6 6" stroke-opacity="0.3"/>
+
+  <!-- 'K' Left Pillar -->
+  <path d="M72 64 H94 V192 H72 Z" fill="url(#blueCyan)" rx="4"/>
+  
+  <!-- 'K' Top-Right Diagonal Wing -->
+  <path d="M94 128 L142 74 H170 L118 132 Z" fill="url(#cyanViolet)"/>
+  
+  <!-- 'K' Bottom-Right Diagonal Leg -->
+  <path d="M110 122 L168 192 H140 L94 136 Z" fill="url(#violetBlue)"/>
+
+  <!-- 'T' Top Bar -->
+  <path d="M140 64 H202 V84 H140 Z" fill="url(#blueCyan)" rx="2"/>
+
+  <!-- 'T' Vertical Stem Connecting Down -->
+  <path d="M166 84 H186 V172 H166 Z" fill="url(#violetBlue)" rx="2"/>
+  
+  <!-- 3D Geometric Energy Node / Core Dot -->
+  <circle cx="176" cy="186" r="6" fill="#22D3EE" filter="url(#glow)"/>
+</svg>
